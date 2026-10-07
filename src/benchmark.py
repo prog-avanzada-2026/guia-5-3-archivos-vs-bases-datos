@@ -1,3 +1,5 @@
+"""Compara las consultas CSV y SQLite y guarda los resultados en JSON."""
+
 import json
 import statistics
 from time import perf_counter
@@ -11,6 +13,15 @@ REPETICIONES = 3
 
 
 def medir(funcion, *args):
+    """Ejecuta una consulta varias veces y devuelve sus tiempos.
+
+    Args:
+        funcion: Consulta que se desea medir.
+        *args: Argumentos de la consulta.
+
+    Returns:
+        tuple: Resultado de la última ejecución y lista de tiempos.
+    """
     tiempos = []
     resultado = None
     for _ in range(REPETICIONES):
@@ -21,6 +32,17 @@ def medir(funcion, *args):
 
 
 def comparar(nombre, csv_func, sqlite_func, *args):
+    """Mide una consulta en CSV y SQLite y reporta la comparación.
+
+    Args:
+        nombre: Nombre de la consulta que aparece en el reporte.
+        csv_func: Versión de la consulta sobre CSV.
+        sqlite_func: Versión de la consulta sobre SQLite.
+        *args: Argumentos comunes a ambas consultas.
+
+    Returns:
+        dict: Medianas de tiempo y factor CSV/SQLite.
+    """
     _, csv_tiempos = medir(csv_func, *args)
     _, sql_tiempos = medir(sqlite_func, *args)
 
@@ -42,6 +64,7 @@ def comparar(nombre, csv_func, sqlite_func, *args):
 
 
 def main():
+    """Ejecuta las tres consultas del taller y guarda benchmark.json."""
     if not CSV_FILE.exists() or not DB_FILE.exists():
         raise FileNotFoundError(
             "Debe generar el CSV y preparar SQLite antes del benchmark."

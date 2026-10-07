@@ -1,3 +1,5 @@
+"""Crea la base SQLite e importa el CSV, con opción de agregar índices."""
+
 import argparse
 import csv
 import sqlite3
@@ -22,17 +24,34 @@ CREATE TABLE estudiantes (
 
 
 def importar_csv(conn: sqlite3.Connection, batch_size: int = 10_000) -> int:
+    """Importa el CSV en la tabla estudiantes por lotes.
+
+    Args:
+        conn: Conexión a la base de datos.
+        batch_size: Cantidad de filas por lote de inserción.
+
+    Returns:
+        int: Total de registros importados.
+    """
     total = 0
     lote = []
 
     with CSV_FILE.open("r", newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            lote.append((
-                int(row["id"]), row["nombre"], row["correo"], row["ciudad"],
-                row["programa"], int(row["semestre"]), float(row["promedio"]),
-                int(row["creditos"]), row["estado"],
-            ))
+            lote.append(
+                (
+                    int(row["id"]),
+                    row["nombre"],
+                    row["correo"],
+                    row["ciudad"],
+                    row["programa"],
+                    int(row["semestre"]),
+                    float(row["promedio"]),
+                    int(row["creditos"]),
+                    row["estado"],
+                )
+            )
 
             if len(lote) >= batch_size:
                 conn.executemany(
@@ -54,6 +73,11 @@ def importar_csv(conn: sqlite3.Connection, batch_size: int = 10_000) -> int:
 
 
 def crear_indices(conn: sqlite3.Connection) -> None:
+    """Crea los índices de correo y de ciudad con promedio.
+
+    Args:
+        conn: Conexión a la base de datos.
+    """
     conn.execute(
         "CREATE INDEX IF NOT EXISTS idx_estudiantes_correo ON estudiantes(correo)"
     )
@@ -67,6 +91,7 @@ def crear_indices(conn: sqlite3.Connection) -> None:
 
 
 def main() -> None:
+    """Lee los argumentos y crea la base o sus índices según la opción."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--indexes", action="store_true")
     args = parser.parse_args()

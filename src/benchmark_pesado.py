@@ -1,3 +1,5 @@
+"""Escenario pesado del Taller 5 con 20 millones de registros."""
+
 import argparse
 import statistics
 from time import perf_counter
@@ -7,6 +9,16 @@ import sqlite_queries
 
 
 def medir(funcion, *args, repeticiones=3):
+    """Ejecuta una consulta varias veces y devuelve sus tiempos.
+
+    Args:
+        funcion: Consulta que se desea medir.
+        *args: Argumentos de la consulta.
+        repeticiones: Cantidad de ejecuciones por consulta.
+
+    Returns:
+        tuple: Resultado de la última ejecución y lista de tiempos.
+    """
     tiempos = []
     resultado = None
     for _ in range(repeticiones):
@@ -17,10 +29,19 @@ def medir(funcion, *args, repeticiones=3):
 
 
 def mediana(tiempos):
+    """Calcula la mediana de una lista de tiempos.
+
+    Args:
+        tiempos: Tiempos medidos en segundos.
+
+    Returns:
+        float: Mediana de los tiempos.
+    """
     return statistics.median(tiempos)
 
 
 def main():
+    """Mide la búsqueda por correo en cuatro posiciones del conjunto."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--rows", type=int, default=20_000_000)
     parser.add_argument("--repeticiones", type=int, default=3)
